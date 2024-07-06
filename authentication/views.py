@@ -152,8 +152,6 @@ class RegisterAndVerifyViewSet(ViewSet):
         otp_key = request.data.get('otp_key')
         otp_code = request.data.get('otp_code')
 
-        if request.user.is_verified:
-            return Response({"detail": "U already verified"}, status.HTTP_400_BAD_REQUEST)
         if not otp_code:
             return Response({"error": "Send otp code"}, status.HTTP_400_BAD_REQUEST)
 
