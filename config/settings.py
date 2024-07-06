@@ -145,5 +145,5 @@ SIMPLE_JWT = {
 CORS_ALLOW_ALL_ORIGINS = True
 
 BOT_ID = '7450282331:AAFEeO-_L9IIHMFWL1M2AvFJzZAuAfffWew'
-CHAT_ID = '-4204976719'
+CHAT_ID = '-1002155244298'
 TELEGRAM_API_URL = 'https://api.telegram.org/bot{}/sendMessage?text={}&chat_id={}'
