@@ -48,6 +48,13 @@ class UserProfileViewSet(ViewSet):
     @swagger_auto_schema(
         operation_description="User detail",
         operation_summary="Returns user detail by token",
+        manual_parameters=[openapi.Parameter(
+            'Authorization',
+            in_=openapi.IN_HEADER,
+            description='Access token',
+            type=openapi.TYPE_STRING,
+            required=True
+        )],
         responses={200: UserSerializer()},
         tags=['user']
 
@@ -63,7 +70,7 @@ class UserProfileViewSet(ViewSet):
 
     @swagger_auto_schema(
         operation_description="Profile update",
-        operation_summary="Register new users",
+        operation_summary="Update profile",
         responses={201: OTPRegisterResendSerializer()},
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
@@ -145,8 +152,6 @@ class RegisterAndVerifyViewSet(ViewSet):
         otp_key = request.data.get('otp_key')
         otp_code = request.data.get('otp_code')
 
-        if not request.user.is_authenticated:
-            return Response({"detail": "You should register first"}, status.HTTP_401_UNAUTHORIZED)
         if request.user.is_verified:
             return Response({"detail": "U already verified"}, status.HTTP_400_BAD_REQUEST)
         if not otp_code:
@@ -213,7 +218,7 @@ class RegisterAndVerifyViewSet(ViewSet):
 class ResendAndResetViewSet(ViewSet):
     @swagger_auto_schema(
         operation_description="New password",
-        operation_summary="Set new password",
+        operation_summary="Use for forget password operation",
         responses={200: "otp key returns"},
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
@@ -309,7 +314,7 @@ class ResendAndResetViewSet(ViewSet):
 
     @swagger_auto_schema(
         operation_description="Resend",
-        operation_summary="Verify registered user",
+        operation_summary="Resend otp code ",
         responses={200: OTPRegisterResendSerializer()},
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
