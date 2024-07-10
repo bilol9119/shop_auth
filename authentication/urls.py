@@ -16,4 +16,6 @@ urlpatterns = [
     path('password/reset/verify/', ResendAndResetViewSet.as_view({"post": "verify_reset_password"})),
     path('set/password/', ResendAndResetViewSet.as_view({"patch": "set_new_password"}))
 
+    # path('users/', )
+    # path('single/user/')
 ]

@@ -42,7 +42,14 @@ class UserProfileViewSet(ViewSet):
 
         if user.check_password(data.get('password')):
             token = RefreshToken.for_user(user)
-            return Response(data={'access': str(token.access_token), 'refresh': str(token)}, status=status.HTTP_200_OK)
+            # Access Token expiration date
+            access_token_expiration = datetime.now() + token.access_token.lifetime
+            # Refresh Token expiration date
+            refresh_token_expiration = datetime.now() + token.lifetime
+            return Response(data={'access': str(token.access_token),
+                                  'refresh': str(token),
+                                  'access_expires': access_token_expiration.isoformat(),
+                                  'refresh_expires': refresh_token_expiration.isoformat()}, status=status.HTTP_200_OK)
         return Response(data={'error': 'password is incorrect', 'ok': False}, status=status.HTTP_400_BAD_REQUEST)
 
     @swagger_auto_schema(
@@ -354,3 +361,11 @@ class ResendAndResetViewSet(ViewSet):
         otp_obj.deleted_at = datetime.now()
         otp_obj.save(update_fields=['deleted_at'])
         return Response(data={"otp_key": new_otp.otp_key}, status=status.HTTP_200_OK)
+
+
+class MicroServiceViewSet(ViewSet):
+    def user_list(self, request, *args, **kwargs):
+        pass
+
+    def single_user(self, request, *args, **kwargs):
+        pass
