@@ -1,6 +1,7 @@
 from django.urls import path
 from rest_framework_simplejwt.views import TokenRefreshView
-from .views import UserProfileViewSet, RegisterAndVerifyViewSet, ResendAndResetViewSet
+from .views import (UserProfileViewSet, RegisterAndVerifyViewSet,
+                    ResendAndResetViewSet, MicroServiceViewSet)
 
 urlpatterns = [
     path('login/', UserProfileViewSet.as_view({"post": "login"})),
@@ -14,8 +15,8 @@ urlpatterns = [
     path('otp/resend/', ResendAndResetViewSet.as_view({"post": "resend_otp_code"})),
     path('password/reset/', ResendAndResetViewSet.as_view({"post": "reset_password"})),
     path('password/reset/verify/', ResendAndResetViewSet.as_view({"post": "verify_reset_password"})),
-    path('set/password/', ResendAndResetViewSet.as_view({"patch": "set_new_password"}))
+    path('set/password/', ResendAndResetViewSet.as_view({"patch": "set_new_password"})),
 
-    # path('users/', )
-    # path('single/user/')
+    path('users/', MicroServiceViewSet.as_view({"post": "user_list"})),
+    path('single/user/', MicroServiceViewSet.as_view({"post": "single_user"}))
 ]

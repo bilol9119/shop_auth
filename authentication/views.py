@@ -13,6 +13,7 @@ from .serializers import (UserSerializer,
                           OTPRegisterResendSerializer, OTPSetPasswordSerializer)
 from .utils import (check_code_expire, checking_number_of_otp,
                     send_otp_code_telegram, check_resend_otp_code, check_token_expire)
+import requests
 
 
 class UserProfileViewSet(ViewSet):
@@ -63,7 +64,8 @@ class UserProfileViewSet(ViewSet):
             required=True
         )],
         responses={200: UserSerializer()},
-        tags=['user']
+        tags=['user'],
+        security=[{'Bearer': []}]
 
     )
     def auth_me(self, request, *args, **kwargs):
@@ -364,8 +366,52 @@ class ResendAndResetViewSet(ViewSet):
 
 
 class MicroServiceViewSet(ViewSet):
-    def user_list(self, request, *args, **kwargs):
-        pass
+    @swagger_auto_schema(
+        operation_description="User list ",
+        operation_summary=" User list for microservice",
+        responses={200: UserSerializer()},
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'secret_token': openapi.Schema(type=openapi.TYPE_STRING, maxLength=100),
+            },
+            required=['secret_token']
+        ),
+        tags=['microservice']
 
+    )
+    def user_list(self, request, *args, **kwargs):
+        secret_token = request.data.get("secret_token")
+        response = requests.post(url="http://134.122.76.27:8026/api/v1/check/token/",
+                                 data={"secret_token": secret_token})
+        if response.status_code != 200:
+            return Response({"error": "who are u"}, status.HTTP_400_BAD_REQUEST)
+
+        serializer = UserSerializer(User.objects.all(), many=True)
+        return Response(serializer.data, status.HTTP_200_OK)
+
+    @swagger_auto_schema(
+        operation_description="Single User ",
+        operation_summary=" User for microservice",
+        responses={200: UserSerializer()},
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'secret_token': openapi.Schema(type=openapi.TYPE_STRING, maxLength=100),
+            },
+            required=['secret_token']
+        ),
+        tags=['microservice'],
+        security=[{'Bearer': []}]
+
+    )
     def single_user(self, request, *args, **kwargs):
-        pass
+        secret_token = request.data.get("secret_token")
+        response = requests.post(url="http://134.122.76.27:8026/api/v1/check/token/",
+                                 data={"secret_token": secret_token})
+        if response.status_code != 200:
+            return Response({"error": "who are u"}, status.HTTP_400_BAD_REQUEST)
+        if not request.user.is_verified:
+            return Response({"error": "User is not verified"}, status.HTTP_401_UNAUTHORIZED)
+        serializer = UserSerializer(request.user)
+        return Response(serializer.data, status.HTTP_200_OK)
